@@ -1,6 +1,6 @@
 # Gradio ALICIA app
 # Claire H Levitt 7 8 2025 | Rocky Mountain Mentors
-# timestamp: 11:04
+# timestamp: 11:45
 
 import os
 import re
@@ -65,65 +65,60 @@ def parse_student_info(text):
                 break
     return prog, year
 
-def build_prompt(user_message, history):
+def build_prompt(user_message):
+    # 1️⃣ base & personalization
     sys_base = {"role": "system", "content": SYSTEM_DESC}
+
     if student_profile:
         sys_personal = {"role": "system",
-                        "content": f"Student program: {student_profile['program']}, Year: {student_profile['year']}."}
+                        "content": f"Student program: {student_profile['program']}, "
+                                   f"Year: {student_profile['year']}."}
     else:
         sys_personal = {"role": "system",
-                        "content": "Ask once for program + year, then remember."}
+                        "content": ("Ask once for program + year, then remember.")}
 
+    # 2️⃣ embed retrieval
     docs = retrieve(user_message, k=5)
     context = "\n\n".join(f"{i+1}. {d[0]}" for i, d in enumerate(docs))
 
+    # 3️⃣ hard rule + context wrapped together
     assistant_context = {
         "role": "assistant",
         "content": (
             "**Grounding data – you MUST base your answer ONLY on these excerpts. "
-            "If they don’t contain the answer, reply 'I don’t have that information, but I searched online and found {then search online and find a reliable source like the program website, find the answer and return the answer AND your source link}. "
-            "Everything should be specific to the University of Colorado Anschutz Medical Campus and Denver campus, as well as the student's current program and year.'**\n\n"
+            "If they don’t contain the answer, reply 'I don’t have that information, but I searched online and found {then search online and find a reliable source like the program website, find the answer and return the answer AND your source link}. Everything should be specific to the University of Colorado Anschutz Medical Campus and Denver campus, as well as the student's current program and year.'**\n\n"
             + context)
     }
 
-    # Use passed history (conversation history) here instead of global conversation
-    return [sys_base, sys_personal] + history + [
-        assistant_context,
-        {"role": "user", "content": user_message}
-    ]
-    
+    # 4️⃣ assemble (context is *immediately* before user)
+    return [sys_base, sys_personal] + conversation + [
+            assistant_context,
+            {"role": "user", "content": user_message}]
 
-def chatbot(message, history=None):
-    global conversation, student_profile
-    if history is None:
-        history = []
+def chat(user_message, model="gpt-4o-mini"):
+    global student_profile, conversation
 
-    if not message.strip():
-        return history
-
-    messages = build_prompt(message, history)
+    # send the prompt
+    messages = build_prompt(user_message)
     response = openai.chat.completions.create(
-        model="gpt-4o-mini",
+        model=model,
         messages=messages,
         temperature=0.3,
-        max_tokens=512
+        max_tokens=512,
     ).choices[0].message.content.strip()
 
-    # Update student profile if not set
+    # 4) If we have no profile yet, try to parse it from the *user* message
     if not student_profile:
-        prog, yr = parse_student_info(message)
+        prog, yr = parse_student_info(user_message)
         if prog and yr:
-            student_profile.update({"program": prog, "year": yr})
+            student_profile = {"program": prog, "year": yr}
 
-    # Add user and assistant messages in correct format
-    history.append({"role": "user", "content": message})
-    history.append({"role": "assistant", "content": response})
-
-    print("Returning history:", history)  # debug print
-
-    return history
-
-
+    # 5) Append turn to running conversation
+    conversation.extend([
+        {"role": "user", "content": user_message},
+        {"role": "assistant", "content": response},
+    ])
+    return response
 
 demo = gr.ChatInterface(
     fn=chatbot,
