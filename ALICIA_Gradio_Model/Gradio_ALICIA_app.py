@@ -65,7 +65,7 @@ def parse_student_info(text):
                 break
     return prog, year
 
-def build_prompt(user_message):
+def build_prompt(user_message, history):
     sys_base = {"role": "system", "content": SYSTEM_DESC}
     if student_profile:
         sys_personal = {"role": "system",
@@ -86,61 +86,22 @@ def build_prompt(user_message):
             + context)
     }
 
-    return [sys_base, sys_personal] + conversation + [
+    # Use passed history (conversation history) here instead of global conversation
+    return [sys_base, sys_personal] + history + [
         assistant_context,
         {"role": "user", "content": user_message}
     ]
+    
 
-def chatbot(message, history):
-    # Initialize history if empty
-    history = history or []
+def chatbot(message, history=None):
+    global conversation, student_profile
+    if history is None:
+        history = []
 
     if not message.strip():
-        # Return empty input and existing history unchanged
-        return "", history
+        return history
 
-    # Parse student info only once from history or message
-    # We'll try to extract profile from history first
-    student_profile = None
-    for msg in history:
-        prog, yr = parse_student_info(msg["content"])
-        if prog and yr:
-            student_profile = {"program": prog, "year": yr}
-            break
-    # If not found in history, try current message
-    if not student_profile:
-        prog, yr = parse_student_info(message)
-        if prog and yr:
-            student_profile = {"program": prog, "year": yr}
-
-    # Build the prompt conversation based on history + current message
-    # Convert gradio history (list of dicts) to OpenAI message format with roles
-    conversation = [{"role": m["role"], "content": m["content"]} for m in history]
-
-    sys_base = {"role": "system", "content": SYSTEM_DESC}
-    if student_profile:
-        sys_personal = {"role": "system",
-                        "content": f"Student program: {student_profile['program']}, Year: {student_profile['year']}."}
-    else:
-        sys_personal = {"role": "system",
-                        "content": "Ask once for program + year, then remember."}
-
-    docs = retrieve(message, k=5)
-    context = "\n\n".join(f"{i+1}. {d[0]}" for i, d in enumerate(docs))
-
-    assistant_context = {
-        "role": "assistant",
-        "content": (
-            "**Grounding data – you MUST base your answer ONLY on these excerpts. "
-            "If they don’t contain the answer, reply 'I don’t have that information, but I searched online and found {then search online and find a reliable source like the program website, find the answer and return the answer AND your source link}. "
-            "Everything should be specific to the University of Colorado Anschutz Medical Campus and Denver campus, as well as the student's current program and year.'**\n\n"
-            + context)
-    }
-
-    # Compose the full prompt messages for OpenAI
-    messages = [sys_base, sys_personal] + conversation + [assistant_context, {"role": "user", "content": message}]
-
-    # Call OpenAI chat completion
+    messages = build_prompt(message, history)
     response = openai.chat.completions.create(
         model="gpt-4o-mini",
         messages=messages,
@@ -148,12 +109,20 @@ def chatbot(message, history):
         max_tokens=512
     ).choices[0].message.content.strip()
 
-    # Append user message and assistant response to history for Gradio
+    # Update student profile if not set
+    if not student_profile:
+        prog, yr = parse_student_info(message)
+        if prog and yr:
+            student_profile.update({"program": prog, "year": yr})
+
+    # Add user and assistant messages in correct format
     history.append({"role": "user", "content": message})
     history.append({"role": "assistant", "content": response})
 
-    # Return empty input box and updated chat history
-    return "", history
+    print("Returning history:", history)  # debug print
+
+    return history
+
 
 
 demo = gr.ChatInterface(
