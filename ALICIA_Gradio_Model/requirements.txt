@@ -1,0 +1,6 @@
+gradio
+openai
+tiktoken
+scikit-learn
+python-dotenv
+numpy
