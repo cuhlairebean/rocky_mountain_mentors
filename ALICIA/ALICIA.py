@@ -24,11 +24,12 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Path of the notebook’s parent folder …/rocky_mountain_mentors
 PROJECT_ROOT = Path.cwd().parent
 
-CORPUS_PATH = PROJECT_ROOT / "data" / "rmm_corpus" / "resources.txt"
-print(CORPUS_PATH)          # sanity-check
+CORPUS_PATH = PROJECT_ROOT / "resources.txt"
+print(CORPUS_PATH)  # sanity-check
+
 assert CORPUS_PATH.exists(), f"{CORPUS_PATH} not found."
 
-AGENT_DESC_PATH = PROJECT_ROOT / "data" / "rmm_corpus" / "agent_description.txt"
+AGENT_DESC_PATH = PROJECT_ROOT / "agent_description.txt"
 
 EMBED_MODEL = "text-embedding-3-small"  # fast & inexpensive; switch if needed
 TOKENIZER = tiktoken.encoding_for_model("gpt-4o")  # for length management
