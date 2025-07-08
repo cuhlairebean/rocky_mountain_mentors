@@ -21,15 +21,18 @@ from pathlib import Path
 load_dotenv()                           # grabs OPENAI_API_KEY from .env
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Path of the notebook’s parent folder …/rocky_mountain_mentors
-PROJECT_ROOT = Path.cwd().parent
+HERE = Path(__file__).parent
 
-CORPUS_PATH = PROJECT_ROOT / "resources.txt"
-print(CORPUS_PATH)  # sanity-check
+CORPUS_PATH = HERE / "resources.txt"
+AGENT_DESC_PATH = HERE / "agent_description.txt"
+
+print("Resolved corpus path:", CORPUS_PATH.resolve())
+print("Resolved agent description path:", AGENT_DESC_PATH.resolve())
 
 assert CORPUS_PATH.exists(), f"{CORPUS_PATH} not found."
+assert AGENT_DESC_PATH.exists(), f"{AGENT_DESC_PATH} not found."
 
-AGENT_DESC_PATH = PROJECT_ROOT / "agent_description.txt"
+rmm_corpus = CORPUS_PATH.read_text(encoding="utf-8")
 
 EMBED_MODEL = "text-embedding-3-small"  # fast & inexpensive; switch if needed
 TOKENIZER = tiktoken.encoding_for_model("gpt-4o")  # for length management
