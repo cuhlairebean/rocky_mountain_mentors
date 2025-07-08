@@ -227,20 +227,22 @@ def parse_student_info(text):
 # %% [markdown]
 # Minimal Tkinter front-end
 
-# %%
-#  Rocky Mountain Mentor UI (logo bigger, new banner text)
-import tkinter as tk
-from tkinter import ttk
-from tkinter.scrolledtext import ScrolledText
-from tkinter import font as tkfont
+# %% 
+# Rocky Mountain Mentor UI (logo bigger, new banner text)
+
+# ───────────── Commented out Tkinter imports ─────────────
+# import tkinter as tk
+# from tkinter import ttk
+# from tkinter.scrolledtext import ScrolledText
+# from tkinter import font as tkfont
 from pathlib import Path
 from PIL import Image, ImageTk
 import threading
 
 # ───────────── Palette ─────────────
-HEADER_BG = "#3c6834"   # soft green
-WINDOW_BG = "#c5b78a"   # light gold
-CHAT_BG   = "#f9f5e9"   # creamy off-white
+HEADER_BG = "#3c6834"
+WINDOW_BG = "#c5b78a"
+CHAT_BG   = "#f9f5e9"
 USER_BG   = "#c5b78a"
 BOT_BG    = "#496d96"
 ACCENT    = "#a46d5e"
@@ -248,110 +250,110 @@ TEXT_DARK = "#000000"
 TEXT_LIGHT= "#ffffff"
 
 # ───────────── Root window ─────────────
-root = tk.Tk()
-root.title("Rocky Mountain Mentors 2025")
-root.configure(bg=WINDOW_BG)
-root.geometry("900x650")
+# root = tk.Tk()
+# root.title("Rocky Mountain Mentors 2025")
+# root.configure(bg=WINDOW_BG)
+# root.geometry("900x650")
 
 # ───────────── Font selection (after root exists) ─────────────
-available_fonts = set(tkfont.families(root))
-base_font = ("SF Pro Text" if "SF Pro Text" in available_fonts
-             else "Helvetica Neue" if "Helvetica Neue" in available_fonts
-             else "Helvetica")
-SYSTEM_FONT = (base_font, 13)
-TITLE_FONT  = (base_font, 26, "bold")
+# available_fonts = set(tkfont.families(root))
+# base_font = (
+#     "SF Pro Text" if "SF Pro Text" in available_fonts
+#     else "Helvetica Neue" if "Helvetica Neue" in available_fonts
+#     else "Helvetica"
+# )
+# SYSTEM_FONT = (base_font, 13)
+# TITLE_FONT  = (base_font, 26, "bold")
 
 # ───────────── ttk styling ─────────────
-style = ttk.Style(root)
-style.theme_use("clam")
-style.configure("TFrame",  background=WINDOW_BG)
-style.configure("Header.TFrame", background=HEADER_BG)
-style.configure("TButton", background=ACCENT, foreground=TEXT_LIGHT,
-                font=SYSTEM_FONT, borderwidth=0)
-style.map("TButton",
-          background=[("active", HEADER_BG), ("pressed", HEADER_BG)])
+# style = ttk.Style(root)
+# style.theme_use("clam")
+# style.configure("TFrame",  background=WINDOW_BG)
+# style.configure("Header.TFrame", background=HEADER_BG)
+# style.configure("TButton", background=ACCENT, foreground=TEXT_LIGHT,
+#                 font=SYSTEM_FONT, borderwidth=0)
+# style.map("TButton",
+#           background=[("active", HEADER_BG), ("pressed", HEADER_BG)])
 
 # ───────────── Header (logo + title) ─────────────
-# ───────────── Header (slim bar w/ big logo) ─────────────
-HEADER_HEIGHT = 50                            # exact green-bar height
-header = ttk.Frame(root, style="Header.TFrame", height=HEADER_HEIGHT)
-header.pack(fill="x", pady=(4, 3))
-header.pack_propagate(False)                     # prevent auto-expansion
+HEADER_HEIGHT = 50
+# header = ttk.Frame(root, style="Header.TFrame", height=HEADER_HEIGHT)
+# header.pack(fill="x", pady=(4, 3))
+# header.pack_propagate(False)
 
-LOGO_W = 75                                    # logo is wide
+LOGO_W = 75
 logo_path = Path.cwd().parent / "data" / "RMM_logo_cropped.png"
-if logo_path.exists():
-    # Resize keeping aspect ratio; the image height may exceed HEADER_HEIGHT,
-    # which is fine—the frame will crop it vertically.
-    logo_img = Image.open(logo_path)
-    w_percent = LOGO_W / float(logo_img.width)
-    new_size = (LOGO_W, int(logo_img.height * w_percent))
-    logo_img = logo_img.resize(new_size, Image.LANCZOS)
-    logo_photo = ImageTk.PhotoImage(logo_img)
-    tk.Label(header, image=logo_photo, bg=HEADER_BG)\
-      .pack(side="left", padx=10)
+# if logo_path.exists():
+#     logo_img = Image.open(logo_path)
+#     w_percent = LOGO_W / float(logo_img.width)
+#     new_size = (LOGO_W, int(logo_img.height * w_percent))
+#     logo_img = logo_img.resize(new_size, Image.LANCZOS)
+#     logo_photo = ImageTk.PhotoImage(logo_img)
+#     tk.Label(header, image=logo_photo, bg=HEADER_BG)\
+#       .pack(side="left", padx=10)
 
-TITLE_FONT = (base_font, 20, "bold")
-tk.Label(header, text="ALICIA: Academic Learning and Institutional Coaching Intelligent Assistant", font=TITLE_FONT,
-         bg=HEADER_BG, fg=TEXT_DARK)\
-  .pack(side="left", padx=(0, 0))
+# TITLE_FONT = (base_font, 20, "bold")
+# tk.Label(header, text="ALICIA: Academic Learning and Institutional Coaching Intelligent Assistant",
+#          font=TITLE_FONT, bg=HEADER_BG, fg=TEXT_DARK)\
+#   .pack(side="left", padx=(0, 0))
 
 # ───────────── Chat area ─────────────
-chat_frame = ttk.Frame(root)
-chat_frame.pack(fill="both", expand=True, padx=15, pady=6)
+# chat_frame = ttk.Frame(root)
+# chat_frame.pack(fill="both", expand=True, padx=15, pady=6)
 
-chat_log = ScrolledText(chat_frame, wrap="word", state="normal",
-                        bg=CHAT_BG, fg=TEXT_DARK, font=SYSTEM_FONT,
-                        borderwidth=0, relief="flat")
-chat_log.pack(fill="both", expand=True)
+# chat_log = ScrolledText(chat_frame, wrap="word", state="normal",
+#                         bg=CHAT_BG, fg=TEXT_DARK, font=SYSTEM_FONT,
+#                         borderwidth=0, relief="flat")
+# chat_log.pack(fill="both", expand=True)
 
-# Bubble tags
-chat_log.tag_configure("user", background=USER_BG, foreground=TEXT_DARK,
-                       lmargin1=8, lmargin2=8, rmargin=8)
-chat_log.tag_configure("bot",  background=BOT_BG,  foreground=TEXT_LIGHT,
-                       lmargin1=8, lmargin2=8, rmargin=8)
-chat_log.tag_configure("bubble_wrap", spacing1=5, spacing3=5)
+# chat_log.tag_configure("user", background=USER_BG, foreground=TEXT_DARK,
+#                        lmargin1=8, lmargin2=8, rmargin=8)
+# chat_log.tag_configure("bot",  background=BOT_BG,  foreground=TEXT_LIGHT,
+#                        lmargin1=8, lmargin2=8, rmargin=8)
+# chat_log.tag_configure("bubble_wrap", spacing1=5, spacing3=5)
 
-# Intro banner
-intro = ("Hi I'm ALICIA. Here to help! Ask me anything about the "
-         "program, mentorship, resources, and more. How can I help you today?")
-chat_log.insert(tk.END, f"╭──\n{intro}\n╰──\n", ("bot", "bubble_wrap"))
-chat_log.configure(state="disabled")    # lock it before normal use
+# intro = (
+#     "Hi I'm ALICIA. Here to help! Ask me anything about the "
+#     "program, mentorship, resources, and more. How can I help you today?"
+# )
+# chat_log.insert(tk.END, f"╭──\n{intro}\n╰──\n", ("bot", "bubble_wrap"))
+# chat_log.configure(state="disabled")
 
 # ───────────── Entry & send button ─────────────
-input_frame = ttk.Frame(root)
-input_frame.pack(fill="x", padx=15, pady=(0, 15))
+# input_frame = ttk.Frame(root)
+# input_frame.pack(fill="x", padx=15, pady=(0, 15))
 
-entry = tk.Text(input_frame, font=SYSTEM_FONT, height=2, wrap="word",
-                relief="flat", highlightthickness=1, highlightbackground="#aaaaaa")
-entry.pack(side="left", fill="x", expand=True, pady=3)
+# entry = tk.Text(input_frame, font=SYSTEM_FONT, height=2, wrap="word",
+#                 relief="flat", highlightthickness=1, highlightbackground="#aaaaaa")
+# entry.pack(side="left", fill="x", expand=True, pady=3)
 
-def send_query():
-    user_msg = entry.get("1.0", "end-1c").strip()
-    if not user_msg:
-        return
-    entry.delete("1.0", tk.END)
+# def send_query():
+#     user_msg = entry.get("1.0", "end-1c").strip()
+#     if not user_msg:
+#         return
+#     entry.delete("1.0", tk.END)
 
-    def insert_bubble(text, tag):
-        chat_log.configure(state="normal")
-        chat_log.insert(tk.END, f"╭──\n{text}\n╰──\n", (tag, "bubble_wrap"))
-        chat_log.configure(state="disabled")
-        chat_log.see(tk.END)
+#     def insert_bubble(text, tag):
+#         chat_log.configure(state="normal")
+#         chat_log.insert(tk.END, f"╭──\n{text}\n╰──\n", (tag, "bubble_wrap"))
+#         chat_log.configure(state="disabled")
+#         chat_log.see(tk.END)
 
-    insert_bubble(user_msg, "user")
+#     insert_bubble(user_msg, "user")
 
-    def worker():
-        try:
-            bot_reply = chat(user_msg)
-        except Exception as e:
-            bot_reply = f"[Error] {e}"
-        insert_bubble(bot_reply, "bot")
-    threading.Thread(target=worker, daemon=True).start()
+#     def worker():
+#         try:
+#             bot_reply = chat(user_msg)
+#         except Exception as e:
+#             bot_reply = f"[Error] {e}"
+#         insert_bubble(bot_reply, "bot")
+#     threading.Thread(target=worker, daemon=True).start()
 
-ttk.Button(input_frame, text="Send", command=send_query)\
-   .pack(side="right", padx=(12, 0), ipadx=10, ipady=6)
+# ttk.Button(input_frame, text="Send", command=send_query)\
+#    .pack(side="right", padx=(12, 0), ipadx=10, ipady=6)
 
-entry.bind("<Return>", lambda e: send_query())
+# entry.bind("<Return>", lambda e: send_query())
+
 
 # ───────────── Launch ─────────────
 root.mainloop()
