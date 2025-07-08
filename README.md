@@ -38,13 +38,15 @@ OPENAI_API_KEY=<your‑key‑here>
 
 ```bash
 # 1 ▸ Clone repository
-$ git clone https://github.com/RockyMountainMentors/ALICIA_GPT_Model.git
-$ cd ALICIA_GPT_Model
+$ git clone https://github.com/ivichadriana/rocky_mountain_mentors.git
+$ cd rocky_mountain_mentors
 
 # 2 ▸ Build and activate environment
+$ cd rocky_mountain_mentors/environment
 $ chmod +x environment_builder.sh
 $ ./environment_builder.sh
 $ conda activate rmm-llm
+$ cd rocky_mountain_mentors/ALICIA
 
 # 3 ▸ Launch ALICIA
 $ python ALICIA.py                # command‑line interface
